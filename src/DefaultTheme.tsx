@@ -74,13 +74,13 @@ function TypewriterDemo() {
   return (
     <pre
       className="font-mono text-[13px] leading-[1.75] whitespace-pre select-none"
-      style={{ color: 'rgba(255,255,255,0.75)' }}
+      style={{ color: '#374151' }}
       aria-hidden="true"
     >
       {displayed}
       {!done && (
         <span
-          className="inline-block w-[2px] h-[14px] bg-indigo-400 ml-px align-middle"
+          className="inline-block w-[2px] h-[14px] bg-indigo-500 ml-px align-middle"
           style={{ animation: 'cursorBlink 0.9s step-end infinite' }}
         />
       )}
@@ -103,118 +103,137 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
   return (
     <div className="grid lg:grid-cols-2 gap-0" style={{ minHeight: 'calc(100vh - 48px)' }}>
 
-      {/* 左：Hero copy + CTA */}
-      <div className="flex flex-col justify-center px-12 py-16 lg:px-16 lg:pr-20">
+      {/* ── 左欄：內容水平置中，讓視覺重心不偏左 */}
+      <div className="flex items-center justify-center px-8 py-20">
+        <div style={{ width: '100%', maxWidth: 520 }}>
 
-        {/* 產品類型標籤 */}
-        <p className="text-xs font-semibold tracking-[0.18em] uppercase text-indigo-500 mb-5">
-          專案結構工具 · 瀏覽器版
-        </p>
+          {/* 產品類型 badge */}
+          <div className="mb-8">
+            <span className="inline-flex items-center px-3 py-1 rounded-full border border-indigo-100 bg-indigo-50 text-[11px] font-semibold tracking-[0.16em] text-indigo-600 uppercase">
+              Project Structure Tool
+            </span>
+          </div>
 
-        {/* 主標：Syne 字型，大、緊、有力 */}
-        <h2
-          className="text-[52px] font-bold leading-[1.08] tracking-tight text-[#1A1A1A] mb-6"
-          style={{ fontFamily: "'Syne', sans-serif" }}
-        >
-          把專案結構<br />
-          整理成<br />
-          <span className="text-indigo-600">可分享的</span><br />
-          文字摘要。
-        </h2>
+          {/* 主標題 — 固定 48px，確保兩行不折斷 */}
+          <h1
+            className="font-bold tracking-tight text-[#1A1A1A] whitespace-nowrap"
+            style={{
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 48,
+              lineHeight: 1.12,
+            }}
+          >
+            把專案結構整理成
+            <br />
+            <span className="text-indigo-600">可分享的文字摘要</span>
+          </h1>
 
-        {/* 說明文字 */}
-        <p className="text-[15px] leading-relaxed text-[#6B7280] mb-8 max-w-xs">
-          選一個本機資料夾或上傳 ZIP，ArchLens 就會在瀏覽器裡解析目錄結構，讓你勾選要保留的節點，然後匯出成 <code className="text-[13px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">.txt</code> 或 <code className="text-[13px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">.md</code>。
-          不需要安裝任何東西。
-        </p>
+          {/* 說明文字 */}
+          <p className="mt-8 text-[18px] leading-8 text-slate-500" style={{ maxWidth: 460 }}>
+            從資料夾到 README，只需要幾秒鐘。
+            在瀏覽器直接分析專案結構，輸出乾淨的 TXT 或 Markdown。
+          </p>
 
-        {/* CTA 按鈕組 */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {folderSupported ? (
+          {/* CTA 按鈕組 */}
+          <div className="flex flex-wrap gap-4 mt-10">
+            {folderSupported ? (
+              <button
+                onClick={onFolderPick}
+                disabled={isLoading}
+                className="px-7 py-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl font-semibold text-[15px] shadow-lg shadow-indigo-200 transition-all duration-150 disabled:opacity-40"
+              >
+                📂 選取資料夾
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm">
+                ⚠️ 請使用 Chrome / Edge（支援資料夾選取）
+              </div>
+            )}
             <button
-              onClick={onFolderPick}
+              onClick={onZipClick}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2.5 px-7 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-[15px] rounded-xl shadow-lg shadow-indigo-200 transition-all duration-150 disabled:opacity-40"
+              className="px-7 py-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
             >
-              <span className="text-lg">📂</span>
-              選取資料夾
+              📦 上傳 ZIP
             </button>
-          ) : (
-            <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-sm">
-              ⚠️ 請使用 Chrome / Edge（支援資料夾選取）
+          </div>
+
+          {/* Feature Cards */}
+          <div className="grid grid-cols-3 gap-3 mt-14">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Feature</div>
+              <div className="font-semibold mt-2 text-[14px]">Browser Only</div>
+              <div className="text-[13px] text-slate-500 mt-1.5">不需安裝任何工具</div>
             </div>
-          )}
-          <button
-            onClick={onZipClick}
-            disabled={isLoading}
-            className="flex items-center justify-center gap-2.5 px-7 py-3.5 bg-white hover:bg-slate-50 active:bg-slate-100 text-[#1A1A1A] font-semibold text-[15px] rounded-xl border border-slate-200 shadow-sm transition-all duration-150 disabled:opacity-40"
-          >
-            <span className="text-lg">📦</span>
-            上傳 ZIP
-          </button>
-        </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Output</div>
+              <div className="font-semibold mt-2 text-[14px]">TXT / MD</div>
+              <div className="text-[13px] text-slate-500 mt-1.5">可直接分享給 AI 或團隊</div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Workflow</div>
+              <div className="font-semibold mt-2 text-[14px]">ZIP Support</div>
+              <div className="text-[13px] text-slate-500 mt-1.5">支援拖放與壓縮檔</div>
+            </div>
+          </div>
 
-        {/* 拖放提示 */}
-        <p
-          className={`text-[13px] transition-colors duration-200 ${
-            isDragOver ? 'text-indigo-500 font-medium' : 'text-slate-400'
-          }`}
-        >
-          {isDragOver ? '✦ 放開以載入 ZIP' : '↓ 或直接拖放 .zip 至頁面上任何位置'}
-        </p>
+          {/* 底部：主題切換 + 拖放提示 */}
+          <div className="mt-10 flex items-center justify-between">
+            <button
+              onClick={onToggleTheme}
+              className="text-[13px] text-slate-400 hover:text-slate-700 transition-colors font-medium"
+            >
+              → 切換到 Developer Mode
+            </button>
+            <p className={`text-[13px] transition-colors duration-200 ${isDragOver ? 'text-indigo-500 font-medium' : 'text-slate-400'}`}>
+              {isDragOver ? '✦ 放開以載入 ZIP' : '支援將 ZIP 直接拖放到頁面'}
+            </p>
+          </div>
 
-        {/* 主題切換 — 明顯的 pill，不藏在 header */}
-        <div className="mt-10 pt-8 border-t border-slate-200">
-          <p className="text-[12px] text-slate-400 mb-3">偏好終端機介面？</p>
-          <button
-            onClick={onToggleTheme}
-            className="flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-mono font-bold text-[13px] rounded-xl transition-colors group"
-          >
-            <span className="text-base group-hover:animate-pulse">&gt;_</span>
-            切換到開發者硬核模式
-            <span className="text-[10px] text-slate-500 font-normal">HACKER</span>
-          </button>
         </div>
       </div>
 
-      {/* 右：ASCII 打字機展示 — 深色背景撐起視覺重量 */}
+      {/* ── 右欄：稿紙線背景 + 浮動終端機視窗（恢復原始設計） */}
       <div
-        className="relative flex flex-col overflow-hidden"
-        style={{ background: '#1C1C1E' }}
+        className="relative flex items-center justify-center overflow-hidden"
+        style={{ background: '#F0EFE9' }}
       >
-        {/* 頂部視窗標題列（貼齊頂部，像真正的 app 視窗） */}
+        {/* 稿紙格線 — opacity 提升到 0.07 讓質感可見 */}
         <div
-          className="flex items-center gap-1.5 px-5 py-3.5 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-          <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-          <span className="w-3 h-3 rounded-full bg-[#28C840]" />
-          <span className="ml-3 font-mono text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            output.txt — ArchLens
-          </span>
-          {/* 右側說明標籤 */}
-          <span
-            className="ml-auto font-mono text-[10px] tracking-wider"
-            style={{ color: 'rgba(255,255,255,0.2)' }}
-          >
-            匯出預覽
-          </span>
-        </div>
+          className="absolute inset-0"
+          style={{
+            opacity: 0.07,
+            backgroundImage: [
+              'linear-gradient(#1A1A1A 1px, transparent 1px)',
+              'linear-gradient(90deg, #1A1A1A 1px, transparent 1px)',
+            ].join(', '),
+            backgroundSize: '32px 32px',
+          }}
+        />
 
-        {/* ASCII 內容區 — 填滿剩餘高度 */}
-        <div className="flex-1 p-8 overflow-auto">
-          <TypewriterDemo />
-        </div>
-
-        {/* 右下角浮水印 */}
+        {/* 浮動終端機視窗 — 寬度拉大，讓它在右欄更有存在感 */}
         <div
-          className="absolute bottom-5 right-6 font-mono text-[10px] tracking-widest uppercase"
-          style={{ color: 'rgba(255,255,255,0.12)' }}
+          className="relative z-10 bg-white rounded-2xl mx-10 w-full"
+          style={{
+            maxWidth: 420,
+            boxShadow: '0 24px 60px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.06)',
+          }}
         >
-          archlens web
+          {/* macOS 視窗標題列 */}
+          <div className="flex items-center gap-1.5 px-5 py-3.5 border-b border-slate-100">
+            <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+            <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+            <span className="w-3 h-3 rounded-full bg-[#28C840]" />
+            <span className="ml-3 font-mono text-[11px] text-slate-400">output.txt</span>
+            <span className="ml-auto font-mono text-[10px] text-slate-300 tracking-wider">匯出即是這個樣子</span>
+          </div>
+          {/* ASCII 打字機 */}
+          <div className="p-6">
+            <TypewriterDemo />
+          </div>
         </div>
       </div>
+
     </div>
   )
 }
