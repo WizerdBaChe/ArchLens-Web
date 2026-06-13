@@ -73,13 +73,14 @@ function TypewriterDemo() {
 
   return (
     <pre
-      className="font-mono text-[13px] leading-[1.75] text-slate-700 whitespace-pre select-none"
+      className="font-mono text-[13px] leading-[1.75] whitespace-pre select-none"
+      style={{ color: 'rgba(255,255,255,0.75)' }}
       aria-hidden="true"
     >
       {displayed}
       {!done && (
         <span
-          className="inline-block w-[2px] h-[14px] bg-indigo-500 ml-px align-middle"
+          className="inline-block w-[2px] h-[14px] bg-indigo-400 ml-px align-middle"
           style={{ animation: 'cursorBlink 0.9s step-end infinite' }}
         />
       )}
@@ -100,10 +101,10 @@ interface HeroProps {
 
 function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick, onToggleTheme }: HeroProps) {
   return (
-    <div className="grid lg:grid-cols-2 gap-0 min-h-[520px]">
+    <div className="grid lg:grid-cols-2 gap-0" style={{ minHeight: 'calc(100vh - 48px)' }}>
 
       {/* 左：Hero copy + CTA */}
-      <div className="flex flex-col justify-center px-10 py-14 lg:pr-16">
+      <div className="flex flex-col justify-center px-12 py-16 lg:px-16 lg:pr-20">
 
         {/* 產品類型標籤 */}
         <p className="text-xs font-semibold tracking-[0.18em] uppercase text-indigo-500 mb-5">
@@ -176,35 +177,42 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
         </div>
       </div>
 
-      {/* 右：ASCII 打字機展示 */}
+      {/* 右：ASCII 打字機展示 — 深色背景撐起視覺重量 */}
       <div
-        className="relative flex items-center justify-center bg-[#F0EFE9] lg:rounded-r-none overflow-hidden"
-        style={{ minHeight: 360 }}
+        className="relative flex flex-col overflow-hidden"
+        style={{ background: '#1C1C1E' }}
       >
-        {/* 背景裝飾格線 */}
+        {/* 頂部視窗標題列（貼齊頂部，像真正的 app 視窗） */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(#1A1A1A 1px, transparent 1px), linear-gradient(90deg, #1A1A1A 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
-          }}
-        />
+          className="flex items-center gap-1.5 px-5 py-3.5 flex-shrink-0"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+        >
+          <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+          <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+          <span className="w-3 h-3 rounded-full bg-[#28C840]" />
+          <span className="ml-3 font-mono text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            output.txt — ArchLens
+          </span>
+          {/* 右側說明標籤 */}
+          <span
+            className="ml-auto font-mono text-[10px] tracking-wider"
+            style={{ color: 'rgba(255,255,255,0.2)' }}
+          >
+            匯出預覽
+          </span>
+        </div>
 
-        {/* 模擬終端機視窗 */}
-        <div className="relative z-10 bg-white rounded-2xl shadow-2xl shadow-slate-200 p-6 mx-8 w-full max-w-[340px]">
-          {/* 視窗標題列 */}
-          <div className="flex items-center gap-1.5 mb-4 pb-3 border-b border-slate-100">
-            <span className="w-3 h-3 rounded-full bg-red-400" />
-            <span className="w-3 h-3 rounded-full bg-yellow-400" />
-            <span className="w-3 h-3 rounded-full bg-green-400" />
-            <span className="ml-3 text-[11px] font-mono text-slate-400">output.txt</span>
-          </div>
+        {/* ASCII 內容區 — 填滿剩餘高度 */}
+        <div className="flex-1 p-8 overflow-auto">
           <TypewriterDemo />
         </div>
 
-        {/* 標籤 */}
-        <div className="absolute bottom-6 right-6 text-[11px] font-mono text-slate-400 tracking-wider">
-          匯出即是這個樣子
+        {/* 右下角浮水印 */}
+        <div
+          className="absolute bottom-5 right-6 font-mono text-[10px] tracking-widest uppercase"
+          style={{ color: 'rgba(255,255,255,0.12)' }}
+        >
+          archlens web
         </div>
       </div>
     </div>
