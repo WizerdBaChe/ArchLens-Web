@@ -28,20 +28,54 @@ export interface HandoffPayload {
   envelope: ReturnType<typeof buildTreeEnvelope>
 }
 
-/** 把結構樹交接給 Diff：寫 localStorage + 開新分頁帶 ?handoff=tree。 */
-export function sendTreeToDiff(root: TreeNodeData): void {
-  const payload: HandoffPayload = {
-    side: 'right',
-    from: 'web',
-    at: Date.now(),
-    envelope: buildTreeEnvelope(root),
-  }
+/**
+ * localStorage 交接的大小上限（字元數）。瀏覽器每來源約 5MB；系列產品共享同一
+ * 來源，留餘裕避免排擠其他鍵或丟 quota 例外。超過就改走「下載 + 手動匯入」回退。
+ */
+const MAX_HANDOFF_CHARS = 4_000_000
+
+export type SendToDiffResult = 'handoff' | 'download-fallback'
+
+function trySetHandoff(value: string): boolean {
   try {
-    localStorage.setItem(HANDOFF_KEY, JSON.stringify(payload))
+    localStorage.setItem(HANDOFF_KEY, value)
+    return true
   } catch {
-    // localStorage 被擋 / 容量不足：仍開 Diff，使用者可改手動匯入下載的 JSON
+    return false
   }
+}
+
+function downloadJson(filename: string, json: string): void {
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+/**
+ * 把結構樹交接給 Diff。
+ * - 一般：寫 localStorage + 開新分頁帶 ?handoff=tree（Diff 自動載入）。
+ * - 樹過大或 localStorage 寫入失敗：改下載 JSON 檔，仍開 Diff —— Diff 會顯示
+ *   「沒有可自動帶入的資料，請手動匯入」，使用者上傳剛下載的檔即可（受控降級）。
+ * 回傳實際採用的模式，呼叫端可據此提示使用者。
+ */
+export function sendTreeToDiff(root: TreeNodeData): SendToDiffResult {
+  const envelope = buildTreeEnvelope(root)
+  const payloadStr = JSON.stringify({ side: 'right', from: 'web', at: Date.now(), envelope } as HandoffPayload)
+
+  let mode: SendToDiffResult = 'handoff'
+  if (payloadStr.length > MAX_HANDOFF_CHARS || !trySetHandoff(payloadStr)) {
+    // 過大就不塞 localStorage（避免 quota 例外 / 排擠）；下載讓使用者手動匯入
+    mode = 'download-fallback'
+    const safeName = root.name ? root.name.replace(/[<>:"/\\|?*]+/g, '') : 'Project'
+    downloadJson(`${safeName}_tree.json`, JSON.stringify(envelope, null, 2))
+  }
+
   const url = new URL(DIFF_URL)
   url.searchParams.set('handoff', 'tree')
   window.open(url.toString(), '_blank', 'noopener')
+  return mode
 }
