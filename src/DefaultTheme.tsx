@@ -434,7 +434,7 @@ export function DefaultTheme({
 
                 {/* 右：預覽 */}
                 <div className="flex flex-col overflow-hidden" style={{ background: '#F5F4F0' }}>
-                  <TreeView asciiText={asciiResult} rootNodeName={rootNode.name} />
+                  <TreeView asciiText={asciiResult} rootNodeName={rootNode.name} rootNode={rootNode} />
                 </div>
               </div>
             </div>

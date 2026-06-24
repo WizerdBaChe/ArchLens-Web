@@ -6,13 +6,17 @@
  */
 
 import { useState } from 'react'
+import type { TreeNodeData } from '../types'
+import { buildTreeEnvelopeJson } from '../services/treeExport'
+import { sendTreeToDiff } from '../services/handoff'
 
 interface TreeViewProps {
   asciiText: string
   rootNodeName?: string
+  rootNode?: TreeNodeData | null
 }
 
-export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName }) => {
+export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName, rootNode }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -47,6 +51,19 @@ export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName }) =
       : 'Project'
     const markdownContent = `# ${title} Structure\n\n\`\`\`text\n${asciiText}\n\`\`\`\n`
     triggerDownload(getDynamicFilename('md'), markdownContent)
+  }
+
+  // 匯出系列共用的 `tree` 信封 JSON（可直接被 ArchLens Diff 等姊妹產品匯入）
+  const exportAsJson = () => {
+    if (!rootNode) return
+    triggerDownload(getDynamicFilename('json'), buildTreeEnvelopeJson(rootNode))
+  }
+
+  // 報告 handoff：把目前結構送到 ArchLens Diff 比較（反孤島）
+  const handleSendToDiff = () => {
+    if (!rootNode) return
+    sendTreeToDiff(rootNode)
+    setShowDropdown(false)
   }
 
   const handleCopy = async () => {
@@ -102,6 +119,22 @@ export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName }) =
                 >
                   ✍️ 匯出 Markdown (.md)
                 </button>
+                {rootNode && (
+                  <button
+                    onClick={exportAsJson}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-700 font-medium transition-colors border-t border-slate-700/50 cursor-pointer"
+                  >
+                    🔗 匯出 JSON tree（給 Diff 等）
+                  </button>
+                )}
+                {rootNode && (
+                  <button
+                    onClick={handleSendToDiff}
+                    className="w-full text-left px-4 py-2.5 text-xs text-indigo-300 hover:bg-slate-700 font-semibold transition-colors border-t border-slate-700/50 cursor-pointer"
+                  >
+                    ↗ 送到 Diff 比較
+                  </button>
+                )}
               </div>
             </>
           )}

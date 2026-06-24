@@ -15,6 +15,8 @@
 import { useRef, useState, useEffect } from 'react'
 import type { TreeNodeData, InputSource } from './types'
 import { useTheme } from './ThemeContext'
+import { buildTreeEnvelopeJson } from './services/treeExport'
+import { sendTreeToDiff } from './services/handoff'
 
 // ─── 常數：inline style 物件避免 Tailwind arbitrary value 過多 ──────────
 const C = {
@@ -140,9 +142,10 @@ function HackerTreeNode({ node, depth = 0, onToggle }: HackerTreeNodeProps) {
 interface HackerOutputProps {
   asciiText: string
   rootNodeName?: string
+  rootNode?: TreeNodeData | null
 }
 
-function HackerOutput({ asciiText, rootNodeName }: HackerOutputProps) {
+function HackerOutput({ asciiText, rootNodeName, rootNode }: HackerOutputProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -166,6 +169,19 @@ function HackerOutput({ asciiText, rootNodeName }: HackerOutputProps) {
     if (!asciiText) return
     const name = getSafeName()
     triggerDownload(`${name}_File_Structure.md`, `# ${name} Structure\n\n\`\`\`text\n${asciiText}\n\`\`\`\n`)
+  }
+
+  // 匯出系列共用的 `tree` 信封 JSON（可直接被 ArchLens Diff 等姊妹產品匯入）
+  const exportJson = () => {
+    if (!rootNode) return
+    triggerDownload(`${getSafeName()}_File_Structure.json`, buildTreeEnvelopeJson(rootNode))
+  }
+
+  // 報告 handoff：把目前結構送到 ArchLens Diff 比較（反孤島）
+  const sendToDiff = () => {
+    if (!rootNode) return
+    sendTreeToDiff(rootNode)
+    setShowDropdown(false)
   }
 
   const handleCopy = async () => {
@@ -220,7 +236,12 @@ function HackerOutput({ asciiText, rootNodeName }: HackerOutputProps) {
             <>
               <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setShowDropdown(false)} />
               <div style={{ position: 'absolute', right: 0, top: 32, zIndex: 20, background: C.bgPanel, border: `1px solid ${C.border}`, minWidth: 160 }}>
-                {[{ label: 'export .txt', fn: exportTxt }, { label: 'export .md', fn: exportMd }].map(item => (
+                {[
+                  { label: 'export .txt', fn: exportTxt },
+                  { label: 'export .md', fn: exportMd },
+                  ...(rootNode ? [{ label: 'export .json (tree)', fn: exportJson }] : []),
+                  ...(rootNode ? [{ label: '↗ send to Diff', fn: sendToDiff }] : []),
+                ].map(item => (
                   <button
                     key={item.label}
                     onClick={item.fn}
@@ -480,7 +501,7 @@ export function HackerTheme({
 
         {/* 右 Panel：Output */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <HackerOutput asciiText={asciiResult} rootNodeName={rootNode?.name} />
+          <HackerOutput asciiText={asciiResult} rootNodeName={rootNode?.name} rootNode={rootNode} />
         </div>
       </div>
 
