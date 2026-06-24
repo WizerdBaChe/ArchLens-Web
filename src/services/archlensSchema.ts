@@ -40,18 +40,28 @@ export interface ArchlensEnvelope<K extends ArchlensKind = ArchlensKind, P = unk
 }
 
 export type TreeEnvelope = ArchlensEnvelope<"tree", TreePayload>;
+export type GraphEnvelope = ArchlensEnvelope<"graph">;
+export type DocsgapEnvelope = ArchlensEnvelope<"docsgap">;
+
+export function wrap<K extends ArchlensKind, P>(
+  kind: K,
+  payload: P,
+  source?: ArchlensSource,
+): ArchlensEnvelope<K, P> {
+  return {
+    archlens: ARCHLENS_ENVELOPE_VERSION,
+    kind,
+    ...(source ? { source } : {}),
+    payload,
+  };
+}
 
 export function wrapTree(
   nodes: TreeNode[],
   source?: ArchlensSource,
   root?: string,
 ): TreeEnvelope {
-  return {
-    archlens: ARCHLENS_ENVELOPE_VERSION,
-    kind: "tree",
-    ...(source ? { source } : {}),
-    payload: root ? { root, nodes } : { nodes },
-  };
+  return wrap("tree", root ? { root, nodes } : { nodes }, source);
 }
 
 export function isArchlensEnvelope(value: unknown): value is ArchlensEnvelope {
