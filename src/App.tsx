@@ -3,20 +3,19 @@
  * 放置路徑：src/App.tsx
  *
  * 唯一職責：
- *  1. 包住 ThemeProvider
- *  2. 跑 useProjectTree() 取得所有狀態
- *  3. 根據 theme 決定渲染 HackerTheme 或 DefaultTheme
- *     （狀態在這層，主題切換不會 reset 資料）
+ *  1. 跑 useProjectTree() 取得所有狀態
+ *  2. 渲染 BlueprintTheme（系列統一的 Blueprint 介面）
+ *
+ * 系列已收斂為單一 Blueprint 風格（色票來自 @archlens/tokens 的 .al-theme-blueprint，
+ * 靜態掛在 <html>）。舊的 Light / Hacker 雙主題與切換已移至 _archive/（保留於磁碟、
+ * 不進 repo），故此處不再有 ThemeProvider / 主題切換。
  */
 
 import './App.css'
-import { ThemeProvider, useTheme } from './ThemeContext'
 import { useProjectTree, isFolderPickerSupported } from './hooks/useProjectTree'
-import { HackerTheme } from './HackerTheme'
-import { DefaultTheme } from './DefaultTheme'
+import { BlueprintTheme } from './BlueprintTheme'
 
-function AppInner() {
-  const { theme } = useTheme()
+function App() {
   const folderSupported = isFolderPickerSupported()
 
   const {
@@ -35,33 +34,23 @@ function AppInner() {
     handleClear,
   } = useProjectTree()
 
-  const sharedProps = {
-    rootNode,
-    asciiResult,
-    isLoading,
-    error,
-    inputSource,
-    mode,
-    enableTruncation,
-    setMode,
-    setEnableTruncation,
-    handleFolderPick,
-    handleZipUpload,
-    handleToggle,
-    handleClear,
-    folderSupported,
-  }
-
-  return theme === 'hacker'
-    ? <HackerTheme {...sharedProps} />
-    : <DefaultTheme {...sharedProps} />
-}
-
-function App() {
   return (
-    <ThemeProvider>
-      <AppInner />
-    </ThemeProvider>
+    <BlueprintTheme
+      rootNode={rootNode}
+      asciiResult={asciiResult}
+      isLoading={isLoading}
+      error={error}
+      inputSource={inputSource}
+      mode={mode}
+      enableTruncation={enableTruncation}
+      setMode={setMode}
+      setEnableTruncation={setEnableTruncation}
+      handleFolderPick={handleFolderPick}
+      handleZipUpload={handleZipUpload}
+      handleToggle={handleToggle}
+      handleClear={handleClear}
+      folderSupported={folderSupported}
+    />
   )
 }
 

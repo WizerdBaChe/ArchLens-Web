@@ -20,3 +20,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Archived (kept on disk, out of the repo): the old Light/Hacker themes and the
+# theme-toggle context, retired when the suite moved to a single Blueprint look.
+# See src/BlueprintTheme.tsx (the re-skinned successor of the old DefaultTheme).
+_archive/
