@@ -3,21 +3,15 @@
  * 放置路徑：src/BlueprintTheme.tsx
  *
  * ArchLens Web 的唯一介面（系列統一為 Blueprint 風格後）。
- * 本檔由舊的 DefaultTheme 複製、依 @archlens/tokens 的 .al-theme-blueprint 色票重繪而來：
  * 不再硬編米白／indigo／slate，而是吃系列共用語意角色（--al-bg / --al-surface /
  * --al-text / --al-accent…）。<html> 已靜態掛 al-theme-blueprint，故這些變數恆為藍圖色票。
- *
- * 與舊版差異：
- *   - 移除主題切換（no useTheme / no toggle）——系列已收斂為單一 Blueprint look。
- *   - 招牌 ASCII 打字機展示保留，墨水改用藍圖前景色。
- *
- * 舊的 Light / Hacker 兩套已移至 _archive/（保留於磁碟、不進 repo）。
  */
 
 import { useRef, useState, useEffect } from 'react'
 import type { TreeNodeData, InputSource } from './types'
 import { TreeNode } from './components/TreeNode'
 import { TreeView } from './components/TreeView'
+import { useLocale, LanguageSwitcher } from './i18n'
 
 // ─── 型別 ──────────────────────────────────────────────────────────────────
 
@@ -55,13 +49,12 @@ const DEMO_TREE = `my-project/
 ├── tsconfig.json
 └── README.md`
 
-function TypewriterDemo() {
+function TypewriterDemo({ caption }: { caption: string }) {
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
 
   useEffect(() => {
     let i = 0
-    // 每個字元 28ms，整體約 0.9 秒跑完
     const timer = setInterval(() => {
       i++
       setDisplayed(DEMO_TREE.slice(0, i))
@@ -74,19 +67,24 @@ function TypewriterDemo() {
   }, [])
 
   return (
-    <pre
-      className="font-mono text-[13px] leading-[1.75] whitespace-pre select-none"
-      style={{ color: 'var(--al-text-secondary)' }}
-      aria-hidden="true"
-    >
-      {displayed}
-      {!done && (
-        <span
-          className="inline-block w-[2px] h-[14px] ml-px align-middle"
-          style={{ background: 'var(--al-accent)', animation: 'cursorBlink 0.9s step-end infinite' }}
-        />
-      )}
-    </pre>
+    <>
+      <pre
+        className="font-mono text-[13px] leading-[1.75] whitespace-pre select-none"
+        style={{ color: 'var(--al-text-secondary)' }}
+        aria-hidden="true"
+      >
+        {displayed}
+        {!done && (
+          <span
+            className="inline-block w-[2px] h-[14px] ml-px align-middle"
+            style={{ background: 'var(--al-accent)', animation: 'cursorBlink 0.9s step-end infinite' }}
+          />
+        )}
+      </pre>
+      <div className="mt-2 font-mono text-[10px] tracking-wider" style={{ color: 'var(--al-text-tertiary)' }}>
+        {caption}
+      </div>
+    </>
   )
 }
 
@@ -101,10 +99,12 @@ interface HeroProps {
 }
 
 function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick }: HeroProps) {
+  const { t } = useLocale()
+
   return (
     <div className="grid lg:grid-cols-2 gap-0" style={{ minHeight: 'calc(100vh - 48px)' }}>
 
-      {/* ── 左欄：內容水平置中，讓視覺重心不偏左 */}
+      {/* ── 左欄：內容水平置中 */}
       <div className="flex items-center justify-center px-8 py-20">
         <div style={{ width: '100%', maxWidth: 520 }}>
 
@@ -118,13 +118,13 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
                 background: 'var(--al-surface-raised)',
               }}
             >
-              Project Structure Tool
+              {t.badge}
             </span>
           </div>
 
-          {/* 主標題 — 固定 48px，確保兩行不折斷 */}
+          {/* 主標題 */}
           <h1
-            className="font-bold tracking-tight whitespace-nowrap"
+            className="font-bold tracking-tight"
             style={{
               fontFamily: 'var(--al-font-display)',
               fontSize: 48,
@@ -132,9 +132,9 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
               color: 'var(--al-text)',
             }}
           >
-            把專案結構整理成
+            {t.heroTitle}
             <br />
-            <span style={{ color: 'var(--al-accent)' }}>可分享的文字摘要</span>
+            <span style={{ color: 'var(--al-accent)' }}>{t.heroTitleAccent}</span>
           </h1>
 
           {/* 說明文字 */}
@@ -142,8 +142,7 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
             className="mt-8 text-[18px] leading-8"
             style={{ maxWidth: 460, color: 'var(--al-text-secondary)' }}
           >
-            從資料夾到 README，只需要幾秒鐘。
-            在瀏覽器直接分析專案結構，輸出乾淨的 TXT 或 Markdown。
+            {t.heroSubtitle}
           </p>
 
           {/* CTA 按鈕組 */}
@@ -152,10 +151,10 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
               <button
                 onClick={onFolderPick}
                 disabled={isLoading}
-                className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
+                className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
                 style={{ background: 'var(--al-accent)', color: 'var(--al-accent-contrast)' }}
               >
-                📂 選取資料夾
+                {t.pickFolder}
               </button>
             ) : (
               <div
@@ -166,29 +165,29 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
                   color: 'var(--al-warning)',
                 }}
               >
-                ⚠️ 請使用 Chrome / Edge（支援資料夾選取）
+                {t.browserWarning}
               </div>
             )}
             <button
               onClick={onZipClick}
               disabled={isLoading}
-              className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
+              className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
               style={{
                 background: 'var(--al-surface)',
                 border: '1px solid var(--al-border)',
                 color: 'var(--al-text)',
               }}
             >
-              📦 上傳 ZIP
+              {t.uploadZip}
             </button>
           </div>
 
           {/* Feature Cards */}
           <div className="grid grid-cols-3 gap-3 mt-14">
             {[
-              { k: 'Feature', t: 'Browser Only', d: '不需安裝任何工具' },
-              { k: 'Output', t: 'TXT / MD', d: '可直接分享給 AI 或團隊' },
-              { k: 'Workflow', t: 'ZIP Support', d: '支援拖放與壓縮檔' },
+              { k: 'Feature', title: t.featureBrowserOnly, desc: t.featureBrowserOnlyDesc },
+              { k: 'Output', title: t.featureOutput, desc: t.featureOutputDesc },
+              { k: 'Workflow', title: t.featureWorkflow, desc: t.featureWorkflowDesc },
             ].map(c => (
               <div
                 key={c.k}
@@ -202,10 +201,10 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
                   {c.k}
                 </div>
                 <div className="font-semibold mt-2 text-[14px]" style={{ color: 'var(--al-text)' }}>
-                  {c.t}
+                  {c.title}
                 </div>
                 <div className="text-[13px] mt-1.5" style={{ color: 'var(--al-text-secondary)' }}>
-                  {c.d}
+                  {c.desc}
                 </div>
               </div>
             ))}
@@ -217,7 +216,7 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
               className="text-[13px] transition-colors duration-200"
               style={{ color: isDragOver ? 'var(--al-accent)' : 'var(--al-text-tertiary)' }}
             >
-              {isDragOver ? '✦ 放開以載入 ZIP' : '支援將 ZIP 直接拖放到頁面'}
+              {isDragOver ? t.dragActive : t.dragHint}
             </p>
           </div>
 
@@ -229,7 +228,7 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
         className="relative flex items-center justify-center overflow-hidden"
         style={{ background: 'var(--al-surface-sunken)' }}
       >
-        {/* 藍圖格線 — 藍圖風格招牌的方眼紙質感 */}
+        {/* 藍圖格線 */}
         <div
           className="absolute inset-0"
           style={{
@@ -263,16 +262,10 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
             <span className="ml-3 font-mono text-[11px]" style={{ color: 'var(--al-text-tertiary)' }}>
               output.txt
             </span>
-            <span
-              className="ml-auto font-mono text-[10px] tracking-wider"
-              style={{ color: 'var(--al-text-tertiary)' }}
-            >
-              匯出即是這個樣子
-            </span>
           </div>
           {/* ASCII 打字機 */}
           <div className="p-6">
-            <TypewriterDemo />
+            <TypewriterDemo caption={t.typewriterCaption} />
           </div>
         </div>
       </div>
@@ -291,6 +284,7 @@ export function BlueprintTheme({
 }: BlueprintThemeProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const { t } = useLocale()
 
   // 全頁拖放（只在空白狀態啟用）
   const handlePageDragOver = (e: React.DragEvent) => {
@@ -299,7 +293,6 @@ export function BlueprintTheme({
     setIsDragOver(true)
   }
   const handlePageDragLeave = (e: React.DragEvent) => {
-    // 只在離開視窗時取消，避免子元素觸發
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
       setIsDragOver(false)
     }
@@ -319,7 +312,6 @@ export function BlueprintTheme({
 
   return (
     <>
-      {/* keyframes + reduced-motion（字體已由 @archlens/tokens 的 --al-font-* 提供） */}
       <style>{`
         @keyframes cursorBlink {
           0%, 100% { opacity: 1; }
@@ -337,7 +329,7 @@ export function BlueprintTheme({
         onDragLeave={handlePageDragLeave}
         onDrop={handlePageDrop}
       >
-        {/* ── Header（有資料後才顯示完整 header，空白狀態 header 很薄） */}
+        {/* ── Header */}
         <header
           className="sticky top-0 z-20 flex items-center justify-between px-8 py-3"
           style={{
@@ -365,65 +357,66 @@ export function BlueprintTheme({
             </span>
           </div>
 
-          {/* 有資料時在 header 顯示來源資訊 + 操作 */}
-          {rootNode && (
-            <div className="flex items-center gap-4">
-              <span className="text-[13px]" style={{ color: 'var(--al-text-secondary)' }}>
-                {inputSource?.type === 'folder' ? '📂' : '📦'}{' '}
-                <span className="font-medium" style={{ color: 'var(--al-text)' }}>{inputSource?.name}</span>
-              </span>
-              <button
-                onClick={handleClear}
-                className="text-[13px] transition-colors px-3 py-1.5 rounded-lg"
-                style={{ color: 'var(--al-text-tertiary)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--al-danger)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--al-text-tertiary)')}
-              >
-                ✕ 清除
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+
+            {rootNode && (
+              <div className="flex items-center gap-4">
+                <span className="text-[13px]" style={{ color: 'var(--al-text-secondary)' }}>
+                  {inputSource?.type === 'folder' ? '📂' : '📦'}{' '}
+                  <span className="font-medium" style={{ color: 'var(--al-text)' }}>{inputSource?.name}</span>
+                </span>
+                <button
+                  onClick={handleClear}
+                  className="text-[13px] transition-all px-3 py-1.5 rounded-lg hover:-translate-y-px hover:shadow-md active:translate-y-0"
+                  style={{ color: 'var(--al-text-tertiary)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--al-danger)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--al-text-tertiary)')}
+                >
+                  {t.clear}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* ── 主內容 */}
         <main className="flex-1 flex flex-col">
 
-          {/* 有資料：工作區（輸入列 + 雙欄視圖） */}
           {rootNode ? (
             <div className="flex-1 flex flex-col gap-0">
 
-              {/* 次要工具列：折疊 + 模式切換 */}
+              {/* 次要工具列 */}
               <div
                 className="flex items-center justify-between px-8 py-3"
                 style={{ borderBottom: '1px solid var(--al-border)', background: 'var(--al-surface)' }}
               >
                 <div className="flex items-center gap-3">
-                  {/* 新增資料按鈕（小） */}
                   {folderSupported && (
                     <button
                       onClick={handleFolderPick}
                       disabled={isLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-colors disabled:opacity-40"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
                       style={{
                         color: 'var(--al-accent)',
                         background: 'var(--al-surface-raised)',
                         border: '1px solid var(--al-border)',
                       }}
                     >
-                      📂 換資料夾
+                      {t.changeFolder}
                     </button>
                   )}
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
                     style={{
                       color: 'var(--al-text-secondary)',
                       background: 'var(--al-surface)',
                       border: '1px solid var(--al-border)',
                     }}
                   >
-                    📦 換 ZIP
+                    {t.changeZip}
                   </button>
                   <input ref={fileInputRef} type="file" accept=".zip" onChange={handleFileInput} className="hidden" />
                   {isLoading && (
@@ -431,7 +424,7 @@ export function BlueprintTheme({
                       className="text-[13px] font-medium flex items-center gap-1.5"
                       style={{ color: 'var(--al-accent)' }}
                     >
-                      <span className="animate-spin inline-block">⟳</span> 解析中...
+                      <span className="animate-spin inline-block">⟳</span> {t.parsing}
                     </span>
                   )}
                   {error && (
@@ -442,7 +435,7 @@ export function BlueprintTheme({
                 <div className="flex items-center gap-4">
                   {/* 智慧折疊 */}
                   <div className="flex items-center gap-2">
-                    <span className="text-[12px] font-medium" style={{ color: 'var(--al-text-secondary)' }}>智慧折疊</span>
+                    <span className="text-[12px] font-medium" style={{ color: 'var(--al-text-secondary)' }}>{t.smartCollapse}</span>
                     <button
                       onClick={() => setEnableTruncation(!enableTruncation)}
                       className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
@@ -459,7 +452,7 @@ export function BlueprintTheme({
                       <button
                         key={m}
                         onClick={() => setMode(m)}
-                        className="px-3 py-1 rounded-md text-[12px] font-semibold transition-all"
+                        className="px-3 py-1 rounded-md text-[12px] font-semibold transition-all hover:-translate-y-px active:translate-y-0"
                         style={
                           mode === m
                             ? { background: 'var(--al-surface-raised)', color: 'var(--al-accent)' }
@@ -489,7 +482,7 @@ export function BlueprintTheme({
                       className="text-[12px] font-semibold uppercase tracking-wider"
                       style={{ color: 'var(--al-text-secondary)' }}
                     >
-                      節點配置
+                      {t.nodeConfig}
                     </span>
                     <span
                       className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
@@ -499,7 +492,7 @@ export function BlueprintTheme({
                         border: '1px solid var(--al-border)',
                       }}
                     >
-                      LIVE
+                      {t.live}
                     </span>
                   </div>
                   <div className="flex-1 overflow-auto p-5">
@@ -520,7 +513,6 @@ export function BlueprintTheme({
               className="flex-1 relative transition-all duration-200"
               style={isDragOver ? { boxShadow: 'inset 0 0 0 4px var(--al-accent)' } : undefined}
             >
-              {/* 全頁拖放遮罩 */}
               {isDragOver && (
                 <div
                   className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm pointer-events-none"
@@ -528,7 +520,7 @@ export function BlueprintTheme({
                 >
                   <div className="text-center">
                     <div className="text-6xl mb-4">📦</div>
-                    <p className="text-xl font-bold" style={{ color: 'var(--al-accent)' }}>放開以載入 ZIP</p>
+                    <p className="text-xl font-bold" style={{ color: 'var(--al-accent)' }}>{t.dropOverlay}</p>
                   </div>
                 </div>
               )}
@@ -541,7 +533,6 @@ export function BlueprintTheme({
                 onZipClick={() => fileInputRef.current?.click()}
               />
 
-              {/* Loading 覆蓋層 */}
               {isLoading && (
                 <div
                   className="absolute inset-0 z-20 flex items-center justify-center backdrop-blur-sm"
@@ -549,12 +540,11 @@ export function BlueprintTheme({
                 >
                   <div className="text-center">
                     <div className="text-4xl mb-3 animate-spin inline-block">⟳</div>
-                    <p className="text-[15px] font-medium" style={{ color: 'var(--al-accent)' }}>解析中，請稍候...</p>
+                    <p className="text-[15px] font-medium" style={{ color: 'var(--al-accent)' }}>{t.parsingSplash}</p>
                   </div>
                 </div>
               )}
 
-              {/* 錯誤訊息 */}
               {error && (
                 <div
                   className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 px-5 py-3 rounded-xl text-[14px] shadow-lg"

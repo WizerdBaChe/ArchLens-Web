@@ -9,6 +9,7 @@ import { useState } from 'react'
 import type { TreeNodeData } from '../types'
 import { buildTreeEnvelopeJson } from '../services/treeExport'
 import { sendTreeToDiff } from '../services/handoff'
+import { useLocale } from '../i18n'
 
 interface TreeViewProps {
   asciiText: string
@@ -19,6 +20,7 @@ interface TreeViewProps {
 export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName, rootNode }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
+  const { t } = useLocale()
 
   // DD-026：動態檔名生成器（過濾 OS 非法字元）
   const getDynamicFilename = (extension: string): string => {
@@ -74,12 +76,28 @@ export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName, roo
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+    <div
+      className="h-full flex flex-col overflow-hidden shadow-2xl"
+      style={{
+        background: 'var(--al-surface)',
+        border: '1px solid var(--al-border)',
+        borderRadius: '1rem',
+      }}
+    >
       {/* 頂部工具列 */}
-      <div className="bg-slate-900 px-6 py-3.5 flex justify-between items-center border-b border-slate-800">
+      <div
+        className="px-6 py-3.5 flex justify-between items-center"
+        style={{
+          background: 'var(--al-surface)',
+          borderBottom: '1px solid var(--al-border)',
+        }}
+      >
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-400 font-mono text-xs uppercase tracking-wider font-bold">
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--al-success)' }} />
+          <span
+            className="font-mono text-xs uppercase tracking-wider font-bold"
+            style={{ color: 'var(--al-text-secondary)' }}
+          >
             ASCII Preview
           </span>
         </div>
@@ -89,50 +107,109 @@ export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName, roo
           <button
             onClick={handleCopy}
             disabled={!asciiText}
-            className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-xl border border-slate-700 cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="text-xs font-semibold px-4 py-2 rounded-xl border cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:-translate-y-px hover:shadow-md active:translate-y-0"
+            style={{
+              background: 'var(--al-surface-raised)',
+              border: '1px solid var(--al-border)',
+              color: 'var(--al-text-secondary)',
+            }}
           >
-            {copied ? '✓ 已複製' : '📋 複製文字'}
+            {copied ? t.copied : t.copyText}
           </button>
 
           {/* 匯出下拉 */}
           <button
             onClick={() => setShowDropdown(!showDropdown)}
             disabled={!asciiText}
-            className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl shadow-md shadow-indigo-950/50 cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="text-xs font-bold px-4 py-2 rounded-xl cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:-translate-y-px hover:shadow-md active:translate-y-0"
+            style={{
+              background: 'var(--al-accent)',
+              color: 'var(--al-accent-contrast)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            }}
           >
-            📥 匯出檔案 ▼
+            {t.exportFile}
           </button>
 
           {showDropdown && asciiText && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)} />
-              <div className="absolute right-0 top-10 w-52 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden py-1">
+              <div
+                className="absolute right-0 top-10 w-52 rounded-xl shadow-xl z-20 overflow-hidden py-1"
+                style={{
+                  background: 'var(--al-surface-raised)',
+                  border: '1px solid var(--al-border)',
+                }}
+              >
                 <button
                   onClick={exportAsTxt}
-                  className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-700 font-medium transition-colors cursor-pointer"
+                  className="w-full text-left px-4 py-2.5 text-xs font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--al-text-secondary)' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--al-surface-sunken)'
+                    e.currentTarget.style.color = 'var(--al-text)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = ''
+                    e.currentTarget.style.color = 'var(--al-text-secondary)'
+                  }}
                 >
-                  📄 匯出純文字 (.txt)
+                  {t.exportTxt}
                 </button>
                 <button
                   onClick={exportAsMd}
-                  className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-700 font-medium transition-colors border-t border-slate-700/50 cursor-pointer"
+                  className="w-full text-left px-4 py-2.5 text-xs font-medium transition-colors cursor-pointer"
+                  style={{
+                    color: 'var(--al-text-secondary)',
+                    borderTop: '1px solid var(--al-border)',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--al-surface-sunken)'
+                    e.currentTarget.style.color = 'var(--al-text)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = ''
+                    e.currentTarget.style.color = 'var(--al-text-secondary)'
+                  }}
                 >
-                  ✍️ 匯出 Markdown (.md)
+                  {t.exportMd}
                 </button>
                 {rootNode && (
                   <button
                     onClick={exportAsJson}
-                    className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-700 font-medium transition-colors border-t border-slate-700/50 cursor-pointer"
+                    className="w-full text-left px-4 py-2.5 text-xs font-medium transition-colors cursor-pointer"
+                    style={{
+                      color: 'var(--al-text-secondary)',
+                      borderTop: '1px solid var(--al-border)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = 'var(--al-surface-sunken)'
+                      e.currentTarget.style.color = 'var(--al-text)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = ''
+                      e.currentTarget.style.color = 'var(--al-text-secondary)'
+                    }}
                   >
-                    🔗 匯出 JSON tree（給 Diff 等）
+                    {t.exportJson}
                   </button>
                 )}
                 {rootNode && (
                   <button
                     onClick={handleSendToDiff}
-                    className="w-full text-left px-4 py-2.5 text-xs text-indigo-300 hover:bg-slate-700 font-semibold transition-colors border-t border-slate-700/50 cursor-pointer"
+                    className="w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors cursor-pointer"
+                    style={{
+                      color: 'var(--al-accent)',
+                      borderTop: '1px solid var(--al-border)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = 'var(--al-surface-sunken)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = ''
+                    }}
                   >
-                    ↗ 送到 Diff 比較
+                    {t.sendToDiff}
                   </button>
                 )}
               </div>
@@ -142,11 +219,17 @@ export const TreeView: React.FC<TreeViewProps> = ({ asciiText, rootNodeName, roo
       </div>
 
       {/* 預覽區 */}
-      <div className="p-6 overflow-auto flex-1 bg-slate-950/50 scrollbar-thin scrollbar-thumb-slate-800">
-        <pre className="text-emerald-400 font-mono text-sm leading-relaxed whitespace-pre font-normal tracking-wide selection:bg-indigo-500/30">
+      <div
+        className="p-6 overflow-auto flex-1 scrollbar-thin"
+        style={{ background: 'var(--al-surface-sunken)' }}
+      >
+        <pre
+          className="font-mono text-sm leading-relaxed whitespace-pre font-normal tracking-wide"
+          style={{ color: 'var(--al-accent)' }}
+        >
           {asciiText || (
-            <span className="text-slate-600 italic font-light">
-              等待左側解析完成後，此處將即時渲染 ASCII 結構圖...
+            <span className="italic font-light" style={{ color: 'var(--al-text-tertiary)' }}>
+              {t.asciiPreviewPlaceholder}
             </span>
           )}
         </pre>
