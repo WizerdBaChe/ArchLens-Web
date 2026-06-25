@@ -22,7 +22,7 @@ export function LanguageSwitcher() {
           type="button"
           onClick={() => setLocale(opt.code)}
           aria-pressed={locale === opt.code}
-          className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all hover:-translate-y-px active:translate-y-0"
+          className="px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition-all hover:-translate-y-px active:translate-y-0"
           style={
             locale === opt.code
               ? { background: 'var(--al-accent)', color: 'var(--al-accent-contrast)' }

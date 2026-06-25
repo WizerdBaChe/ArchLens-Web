@@ -35,7 +35,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, depth = 0, onToggle })
           {node.is_dir && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="transition-all duration-200 hover:-translate-y-px active:translate-y-0"
+              className="cursor-pointer transition-all duration-200 hover:-translate-y-px active:translate-y-0"
               style={{
                 color: 'var(--al-text-tertiary)',
                 transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',

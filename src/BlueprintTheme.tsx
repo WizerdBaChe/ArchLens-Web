@@ -151,7 +151,7 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
               <button
                 onClick={onFolderPick}
                 disabled={isLoading}
-                className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
+                className="px-7 py-4 rounded-2xl font-semibold text-[15px] cursor-pointer transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
                 style={{ background: 'var(--al-accent)', color: 'var(--al-accent-contrast)' }}
               >
                 {t.pickFolder}
@@ -171,7 +171,7 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
             <button
               onClick={onZipClick}
               disabled={isLoading}
-              className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
+              className="px-7 py-4 rounded-2xl font-semibold text-[15px] cursor-pointer transition-all duration-150 disabled:opacity-40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
               style={{
                 background: 'var(--al-surface)',
                 border: '1px solid var(--al-border)',
@@ -368,7 +368,7 @@ export function BlueprintTheme({
                 </span>
                 <button
                   onClick={handleClear}
-                  className="text-[13px] transition-all px-3 py-1.5 rounded-lg hover:-translate-y-px hover:shadow-md active:translate-y-0"
+                  className="text-[13px] cursor-pointer transition-all px-3 py-1.5 rounded-lg hover:-translate-y-px hover:shadow-md active:translate-y-0"
                   style={{ color: 'var(--al-text-tertiary)' }}
                   onMouseEnter={e => (e.currentTarget.style.color = 'var(--al-danger)')}
                   onMouseLeave={e => (e.currentTarget.style.color = 'var(--al-text-tertiary)')}
@@ -396,7 +396,7 @@ export function BlueprintTheme({
                     <button
                       onClick={handleFolderPick}
                       disabled={isLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold cursor-pointer rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
                       style={{
                         color: 'var(--al-accent)',
                         background: 'var(--al-surface-raised)',
@@ -409,7 +409,7 @@ export function BlueprintTheme({
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold cursor-pointer rounded-lg transition-all disabled:opacity-40 hover:-translate-y-px hover:shadow-md active:translate-y-0"
                     style={{
                       color: 'var(--al-text-secondary)',
                       background: 'var(--al-surface)',
@@ -438,7 +438,7 @@ export function BlueprintTheme({
                     <span className="text-[12px] font-medium" style={{ color: 'var(--al-text-secondary)' }}>{t.smartCollapse}</span>
                     <button
                       onClick={() => setEnableTruncation(!enableTruncation)}
-                      className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                      className="relative inline-flex h-5 w-9 items-center rounded-full cursor-pointer transition-colors"
                       style={{ background: enableTruncation ? 'var(--al-accent)' : 'var(--al-border)' }}
                     >
                       <span className={`inline-block h-3.5 w-3.5 transform rounded-full shadow transition-transform ${
@@ -452,7 +452,7 @@ export function BlueprintTheme({
                       <button
                         key={m}
                         onClick={() => setMode(m)}
-                        className="px-3 py-1 rounded-md text-[12px] font-semibold transition-all hover:-translate-y-px active:translate-y-0"
+                        className="px-3 py-1 rounded-md text-[12px] font-semibold cursor-pointer transition-all hover:-translate-y-px active:translate-y-0"
                         style={
                           mode === m
                             ? { background: 'var(--al-surface-raised)', color: 'var(--al-accent)' }
