@@ -1,25 +1,27 @@
 /**
- * DefaultTheme.tsx
- * 放置路徑：src/DefaultTheme.tsx
+ * BlueprintTheme.tsx
+ * 放置路徑：src/BlueprintTheme.tsx
  *
- * 設計計劃：
- *   Palette  #F5F4F0 暖米底 / #1A1A1A ink / #6B7280 slate /
- *            #4F46E5 indigo（唯一行動色）/ #FFFFFF white
- *   Type     Syne 700 (hero display) + Inter (body/UI)
- *   Empty    左 hero copy + 右 ASCII 打字機展示，空白頁即是產品說明
- *   Signature  ASCII 打字機動畫：首次載入時逐行打出範例 tree，
- *              用產品本身的語言說明產品能做什麼
+ * ArchLens Web 的唯一介面（系列統一為 Blueprint 風格後）。
+ * 本檔由舊的 DefaultTheme 複製、依 @archlens/tokens 的 .al-theme-blueprint 色票重繪而來：
+ * 不再硬編米白／indigo／slate，而是吃系列共用語意角色（--al-bg / --al-surface /
+ * --al-text / --al-accent…）。<html> 已靜態掛 al-theme-blueprint，故這些變數恆為藍圖色票。
+ *
+ * 與舊版差異：
+ *   - 移除主題切換（no useTheme / no toggle）——系列已收斂為單一 Blueprint look。
+ *   - 招牌 ASCII 打字機展示保留，墨水改用藍圖前景色。
+ *
+ * 舊的 Light / Hacker 兩套已移至 _archive/（保留於磁碟、不進 repo）。
  */
 
 import { useRef, useState, useEffect } from 'react'
 import type { TreeNodeData, InputSource } from './types'
 import { TreeNode } from './components/TreeNode'
 import { TreeView } from './components/TreeView'
-import { useTheme } from './ThemeContext'
 
 // ─── 型別 ──────────────────────────────────────────────────────────────────
 
-interface DefaultThemeProps {
+interface BlueprintThemeProps {
   rootNode: TreeNodeData | null
   asciiResult: string
   isLoading: boolean
@@ -74,14 +76,14 @@ function TypewriterDemo() {
   return (
     <pre
       className="font-mono text-[13px] leading-[1.75] whitespace-pre select-none"
-      style={{ color: '#374151' }}
+      style={{ color: 'var(--al-text-secondary)' }}
       aria-hidden="true"
     >
       {displayed}
       {!done && (
         <span
-          className="inline-block w-[2px] h-[14px] bg-indigo-500 ml-px align-middle"
-          style={{ animation: 'cursorBlink 0.9s step-end infinite' }}
+          className="inline-block w-[2px] h-[14px] ml-px align-middle"
+          style={{ background: 'var(--al-accent)', animation: 'cursorBlink 0.9s step-end infinite' }}
         />
       )}
     </pre>
@@ -96,10 +98,9 @@ interface HeroProps {
   isDragOver: boolean
   onFolderPick: () => void
   onZipClick: () => void
-  onToggleTheme: () => void
 }
 
-function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick, onToggleTheme }: HeroProps) {
+function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick }: HeroProps) {
   return (
     <div className="grid lg:grid-cols-2 gap-0" style={{ minHeight: 'calc(100vh - 48px)' }}>
 
@@ -109,27 +110,38 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
 
           {/* 產品類型 badge */}
           <div className="mb-8">
-            <span className="inline-flex items-center px-3 py-1 rounded-full border border-indigo-100 bg-indigo-50 text-[11px] font-semibold tracking-[0.16em] text-indigo-600 uppercase">
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold tracking-[0.16em] uppercase"
+              style={{
+                color: 'var(--al-accent)',
+                border: '1px solid var(--al-border)',
+                background: 'var(--al-surface-raised)',
+              }}
+            >
               Project Structure Tool
             </span>
           </div>
 
           {/* 主標題 — 固定 48px，確保兩行不折斷 */}
           <h1
-            className="font-bold tracking-tight text-[#1A1A1A] whitespace-nowrap"
+            className="font-bold tracking-tight whitespace-nowrap"
             style={{
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: 'var(--al-font-display)',
               fontSize: 48,
               lineHeight: 1.12,
+              color: 'var(--al-text)',
             }}
           >
             把專案結構整理成
             <br />
-            <span className="text-indigo-600">可分享的文字摘要</span>
+            <span style={{ color: 'var(--al-accent)' }}>可分享的文字摘要</span>
           </h1>
 
           {/* 說明文字 */}
-          <p className="mt-8 text-[18px] leading-8 text-slate-500" style={{ maxWidth: 460 }}>
+          <p
+            className="mt-8 text-[18px] leading-8"
+            style={{ maxWidth: 460, color: 'var(--al-text-secondary)' }}
+          >
             從資料夾到 README，只需要幾秒鐘。
             在瀏覽器直接分析專案結構，輸出乾淨的 TXT 或 Markdown。
           </p>
@@ -140,19 +152,32 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
               <button
                 onClick={onFolderPick}
                 disabled={isLoading}
-                className="px-7 py-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl font-semibold text-[15px] shadow-lg shadow-indigo-200 transition-all duration-150 disabled:opacity-40"
+                className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
+                style={{ background: 'var(--al-accent)', color: 'var(--al-accent-contrast)' }}
               >
                 📂 選取資料夾
               </button>
             ) : (
-              <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm">
+              <div
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm"
+                style={{
+                  background: 'var(--al-surface-raised)',
+                  border: '1px solid var(--al-warning)',
+                  color: 'var(--al-warning)',
+                }}
+              >
                 ⚠️ 請使用 Chrome / Edge（支援資料夾選取）
               </div>
             )}
             <button
               onClick={onZipClick}
               disabled={isLoading}
-              className="px-7 py-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
+              className="px-7 py-4 rounded-2xl font-semibold text-[15px] transition-all duration-150 disabled:opacity-40"
+              style={{
+                background: 'var(--al-surface)',
+                border: '1px solid var(--al-border)',
+                color: 'var(--al-text)',
+              }}
             >
               📦 上傳 ZIP
             </button>
@@ -160,32 +185,38 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
 
           {/* Feature Cards */}
           <div className="grid grid-cols-3 gap-3 mt-14">
-            <div className="bg-white border border-slate-200 rounded-2xl p-5">
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Feature</div>
-              <div className="font-semibold mt-2 text-[14px]">Browser Only</div>
-              <div className="text-[13px] text-slate-500 mt-1.5">不需安裝任何工具</div>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-2xl p-5">
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Output</div>
-              <div className="font-semibold mt-2 text-[14px]">TXT / MD</div>
-              <div className="text-[13px] text-slate-500 mt-1.5">可直接分享給 AI 或團隊</div>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-2xl p-5">
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Workflow</div>
-              <div className="font-semibold mt-2 text-[14px]">ZIP Support</div>
-              <div className="text-[13px] text-slate-500 mt-1.5">支援拖放與壓縮檔</div>
-            </div>
+            {[
+              { k: 'Feature', t: 'Browser Only', d: '不需安裝任何工具' },
+              { k: 'Output', t: 'TXT / MD', d: '可直接分享給 AI 或團隊' },
+              { k: 'Workflow', t: 'ZIP Support', d: '支援拖放與壓縮檔' },
+            ].map(c => (
+              <div
+                key={c.k}
+                className="rounded-2xl p-5"
+                style={{ background: 'var(--al-surface)', border: '1px solid var(--al-border)' }}
+              >
+                <div
+                  className="text-[10px] uppercase tracking-wider font-semibold"
+                  style={{ color: 'var(--al-text-tertiary)' }}
+                >
+                  {c.k}
+                </div>
+                <div className="font-semibold mt-2 text-[14px]" style={{ color: 'var(--al-text)' }}>
+                  {c.t}
+                </div>
+                <div className="text-[13px] mt-1.5" style={{ color: 'var(--al-text-secondary)' }}>
+                  {c.d}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* 底部：主題切換 + 拖放提示 */}
-          <div className="mt-10 flex items-center justify-between">
-            <button
-              onClick={onToggleTheme}
-              className="text-[13px] text-slate-400 hover:text-slate-700 transition-colors font-medium"
+          {/* 底部：拖放提示 */}
+          <div className="mt-10 flex items-center justify-end">
+            <p
+              className="text-[13px] transition-colors duration-200"
+              style={{ color: isDragOver ? 'var(--al-accent)' : 'var(--al-text-tertiary)' }}
             >
-              → 切換到 Developer Mode
-            </button>
-            <p className={`text-[13px] transition-colors duration-200 ${isDragOver ? 'text-indigo-500 font-medium' : 'text-slate-400'}`}>
               {isDragOver ? '✦ 放開以載入 ZIP' : '支援將 ZIP 直接拖放到頁面'}
             </p>
           </div>
@@ -193,39 +224,51 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
         </div>
       </div>
 
-      {/* ── 右欄：稿紙線背景 + 浮動終端機視窗（恢復原始設計） */}
+      {/* ── 右欄：藍圖格線背景 + 浮動終端機視窗 */}
       <div
         className="relative flex items-center justify-center overflow-hidden"
-        style={{ background: '#F0EFE9' }}
+        style={{ background: 'var(--al-surface-sunken)' }}
       >
-        {/* 稿紙格線 — opacity 提升到 0.07 讓質感可見 */}
+        {/* 藍圖格線 — 藍圖風格招牌的方眼紙質感 */}
         <div
           className="absolute inset-0"
           style={{
-            opacity: 0.07,
+            opacity: 0.5,
             backgroundImage: [
-              'linear-gradient(#1A1A1A 1px, transparent 1px)',
-              'linear-gradient(90deg, #1A1A1A 1px, transparent 1px)',
+              'linear-gradient(var(--al-border) 1px, transparent 1px)',
+              'linear-gradient(90deg, var(--al-border) 1px, transparent 1px)',
             ].join(', '),
             backgroundSize: '32px 32px',
           }}
         />
 
-        {/* 浮動終端機視窗 — 寬度拉大，讓它在右欄更有存在感 */}
+        {/* 浮動終端機視窗 */}
         <div
-          className="relative z-10 bg-white rounded-2xl mx-10 w-full"
+          className="relative z-10 rounded-2xl mx-10 w-full"
           style={{
             maxWidth: 420,
-            boxShadow: '0 24px 60px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.06)',
+            background: 'var(--al-surface)',
+            border: '1px solid var(--al-border)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.25)',
           }}
         >
-          {/* macOS 視窗標題列 */}
-          <div className="flex items-center gap-1.5 px-5 py-3.5 border-b border-slate-100">
+          {/* 視窗標題列 */}
+          <div
+            className="flex items-center gap-1.5 px-5 py-3.5"
+            style={{ borderBottom: '1px solid var(--al-border)' }}
+          >
             <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
             <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
             <span className="w-3 h-3 rounded-full bg-[#28C840]" />
-            <span className="ml-3 font-mono text-[11px] text-slate-400">output.txt</span>
-            <span className="ml-auto font-mono text-[10px] text-slate-300 tracking-wider">匯出即是這個樣子</span>
+            <span className="ml-3 font-mono text-[11px]" style={{ color: 'var(--al-text-tertiary)' }}>
+              output.txt
+            </span>
+            <span
+              className="ml-auto font-mono text-[10px] tracking-wider"
+              style={{ color: 'var(--al-text-tertiary)' }}
+            >
+              匯出即是這個樣子
+            </span>
           </div>
           {/* ASCII 打字機 */}
           <div className="p-6">
@@ -240,13 +283,12 @@ function Hero({ folderSupported, isLoading, isDragOver, onFolderPick, onZipClick
 
 // ─── 主元件 ────────────────────────────────────────────────────────────────
 
-export function DefaultTheme({
+export function BlueprintTheme({
   rootNode, asciiResult, isLoading, error, inputSource,
   mode, enableTruncation, setMode, setEnableTruncation,
   handleFolderPick, handleZipUpload, handleToggle, handleClear,
   folderSupported,
-}: DefaultThemeProps) {
-  const { toggleTheme } = useTheme()
+}: BlueprintThemeProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -277,9 +319,8 @@ export function DefaultTheme({
 
   return (
     <>
-      {/* Google Fonts */}
+      {/* keyframes + reduced-motion（字體已由 @archlens/tokens 的 --al-font-* 提供） */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700;900&display=swap');
         @keyframes cursorBlink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
@@ -291,21 +332,35 @@ export function DefaultTheme({
 
       <div
         className="min-h-screen flex flex-col"
-        style={{ background: '#F5F4F0', fontFamily: "'Inter', sans-serif", color: '#1A1A1A' }}
+        style={{ background: 'var(--al-bg)', fontFamily: 'var(--al-font-body)', color: 'var(--al-text)' }}
         onDragOver={handlePageDragOver}
         onDragLeave={handlePageDragLeave}
         onDrop={handlePageDrop}
       >
         {/* ── Header（有資料後才顯示完整 header，空白狀態 header 很薄） */}
         <header
-          className="sticky top-0 z-20 flex items-center justify-between px-8 py-3 border-b"
-          style={{ background: 'rgba(245,244,240,0.85)', backdropFilter: 'blur(12px)', borderColor: '#E5E3DC' }}
+          className="sticky top-0 z-20 flex items-center justify-between px-8 py-3"
+          style={{
+            background: 'color-mix(in srgb, var(--al-bg) 85%, transparent)',
+            backdropFilter: 'blur(12px)',
+            borderBottom: '1px solid var(--al-border)',
+          }}
         >
           <div className="flex items-center gap-2.5">
-            <span className="text-xl font-bold tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <span
+              className="text-xl font-bold tracking-tight"
+              style={{ fontFamily: 'var(--al-font-display)', color: 'var(--al-text)' }}
+            >
               ArchLens
             </span>
-            <span className="text-[11px] font-semibold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+            <span
+              className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+              style={{
+                color: 'var(--al-accent)',
+                background: 'var(--al-surface-raised)',
+                border: '1px solid var(--al-border)',
+              }}
+            >
               Web
             </span>
           </div>
@@ -313,21 +368,18 @@ export function DefaultTheme({
           {/* 有資料時在 header 顯示來源資訊 + 操作 */}
           {rootNode && (
             <div className="flex items-center gap-4">
-              <span className="text-[13px] text-slate-500">
+              <span className="text-[13px]" style={{ color: 'var(--al-text-secondary)' }}>
                 {inputSource?.type === 'folder' ? '📂' : '📦'}{' '}
-                <span className="font-medium text-slate-700">{inputSource?.name}</span>
+                <span className="font-medium" style={{ color: 'var(--al-text)' }}>{inputSource?.name}</span>
               </span>
               <button
                 onClick={handleClear}
-                className="text-[13px] text-slate-400 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
+                className="text-[13px] transition-colors px-3 py-1.5 rounded-lg"
+                style={{ color: 'var(--al-text-tertiary)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--al-danger)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--al-text-tertiary)')}
               >
                 ✕ 清除
-              </button>
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-mono text-[11px] font-bold rounded-lg transition-colors"
-              >
-                &gt;_ HACKER
               </button>
             </div>
           )}
@@ -342,8 +394,8 @@ export function DefaultTheme({
 
               {/* 次要工具列：折疊 + 模式切換 */}
               <div
-                className="flex items-center justify-between px-8 py-3 border-b"
-                style={{ borderColor: '#E5E3DC', background: '#FFFFFF' }}
+                className="flex items-center justify-between px-8 py-3"
+                style={{ borderBottom: '1px solid var(--al-border)', background: 'var(--al-surface)' }}
               >
                 <div className="flex items-center gap-3">
                   {/* 新增資料按鈕（小） */}
@@ -351,7 +403,12 @@ export function DefaultTheme({
                     <button
                       onClick={handleFolderPick}
                       disabled={isLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-100 transition-colors disabled:opacity-40"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-colors disabled:opacity-40"
+                      style={{
+                        color: 'var(--al-accent)',
+                        background: 'var(--al-surface-raised)',
+                        border: '1px solid var(--al-border)',
+                      }}
                     >
                       📂 換資料夾
                     </button>
@@ -359,47 +416,55 @@ export function DefaultTheme({
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-600 bg-white hover:bg-slate-50 rounded-lg border border-slate-200 transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg transition-colors disabled:opacity-40"
+                    style={{
+                      color: 'var(--al-text-secondary)',
+                      background: 'var(--al-surface)',
+                      border: '1px solid var(--al-border)',
+                    }}
                   >
                     📦 換 ZIP
                   </button>
                   <input ref={fileInputRef} type="file" accept=".zip" onChange={handleFileInput} className="hidden" />
                   {isLoading && (
-                    <span className="text-[13px] text-indigo-600 font-medium flex items-center gap-1.5">
+                    <span
+                      className="text-[13px] font-medium flex items-center gap-1.5"
+                      style={{ color: 'var(--al-accent)' }}
+                    >
                       <span className="animate-spin inline-block">⟳</span> 解析中...
                     </span>
                   )}
                   {error && (
-                    <span className="text-[13px] text-red-500">⚠ {error}</span>
+                    <span className="text-[13px]" style={{ color: 'var(--al-danger)' }}>⚠ {error}</span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-4">
                   {/* 智慧折疊 */}
                   <div className="flex items-center gap-2">
-                    <span className="text-[12px] font-medium text-slate-500">智慧折疊</span>
+                    <span className="text-[12px] font-medium" style={{ color: 'var(--al-text-secondary)' }}>智慧折疊</span>
                     <button
                       onClick={() => setEnableTruncation(!enableTruncation)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        enableTruncation ? 'bg-indigo-600' : 'bg-slate-300'
-                      }`}
+                      className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                      style={{ background: enableTruncation ? 'var(--al-accent)' : 'var(--al-border)' }}
                     >
-                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full shadow transition-transform ${
                         enableTruncation ? 'translate-x-4' : 'translate-x-1'
-                      }`} />
+                      }`} style={{ background: 'var(--al-surface-raised)' }} />
                     </button>
                   </div>
                   {/* 模式切換 */}
-                  <div className="flex p-0.5 bg-slate-100 rounded-lg">
+                  <div className="flex p-0.5 rounded-lg" style={{ background: 'var(--al-surface-sunken)' }}>
                     {(['basic', 'full'] as const).map(m => (
                       <button
                         key={m}
                         onClick={() => setMode(m)}
-                        className={`px-3 py-1 rounded-md text-[12px] font-semibold transition-all ${
+                        className="px-3 py-1 rounded-md text-[12px] font-semibold transition-all"
+                        style={
                           mode === m
-                            ? 'bg-white text-indigo-600 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
-                        }`}
+                            ? { background: 'var(--al-surface-raised)', color: 'var(--al-accent)' }
+                            : { background: 'transparent', color: 'var(--al-text-secondary)' }
+                        }
                       >
                         {m.toUpperCase()}
                       </button>
@@ -413,17 +478,27 @@ export function DefaultTheme({
 
                 {/* 左：節點樹 */}
                 <div
-                  className="flex flex-col overflow-hidden border-r"
-                  style={{ borderColor: '#E5E3DC', background: '#FFFFFF' }}
+                  className="flex flex-col overflow-hidden"
+                  style={{ borderRight: '1px solid var(--al-border)', background: 'var(--al-surface)' }}
                 >
                   <div
-                    className="flex items-center justify-between px-6 py-3 border-b flex-shrink-0"
-                    style={{ borderColor: '#F0EFE9' }}
+                    className="flex items-center justify-between px-6 py-3 flex-shrink-0"
+                    style={{ borderBottom: '1px solid var(--al-border)' }}
                   >
-                    <span className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider">
+                    <span
+                      className="text-[12px] font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--al-text-secondary)' }}
+                    >
                       節點配置
                     </span>
-                    <span className="text-[10px] bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-full font-semibold border border-indigo-100">
+                    <span
+                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                      style={{
+                        color: 'var(--al-accent)',
+                        background: 'var(--al-surface-raised)',
+                        border: '1px solid var(--al-border)',
+                      }}
+                    >
                       LIVE
                     </span>
                   </div>
@@ -433,7 +508,7 @@ export function DefaultTheme({
                 </div>
 
                 {/* 右：預覽 */}
-                <div className="flex flex-col overflow-hidden" style={{ background: '#F5F4F0' }}>
+                <div className="flex flex-col overflow-hidden" style={{ background: 'var(--al-bg)' }}>
                   <TreeView asciiText={asciiResult} rootNodeName={rootNode.name} rootNode={rootNode} />
                 </div>
               </div>
@@ -442,16 +517,18 @@ export function DefaultTheme({
           ) : (
             /* 空白狀態：Hero */
             <div
-              className={`flex-1 relative transition-all duration-200 ${
-                isDragOver ? 'ring-4 ring-inset ring-indigo-300' : ''
-              }`}
+              className="flex-1 relative transition-all duration-200"
+              style={isDragOver ? { boxShadow: 'inset 0 0 0 4px var(--al-accent)' } : undefined}
             >
               {/* 全頁拖放遮罩 */}
               {isDragOver && (
-                <div className="absolute inset-0 z-30 flex items-center justify-center bg-indigo-50/80 backdrop-blur-sm pointer-events-none">
+                <div
+                  className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm pointer-events-none"
+                  style={{ background: 'color-mix(in srgb, var(--al-surface) 80%, transparent)' }}
+                >
                   <div className="text-center">
                     <div className="text-6xl mb-4">📦</div>
-                    <p className="text-xl font-bold text-indigo-600">放開以載入 ZIP</p>
+                    <p className="text-xl font-bold" style={{ color: 'var(--al-accent)' }}>放開以載入 ZIP</p>
                   </div>
                 </div>
               )}
@@ -462,22 +539,31 @@ export function DefaultTheme({
                 isDragOver={isDragOver}
                 onFolderPick={handleFolderPick}
                 onZipClick={() => fileInputRef.current?.click()}
-                onToggleTheme={toggleTheme}
               />
 
               {/* Loading 覆蓋層 */}
               {isLoading && (
-                <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                <div
+                  className="absolute inset-0 z-20 flex items-center justify-center backdrop-blur-sm"
+                  style={{ background: 'color-mix(in srgb, var(--al-bg) 60%, transparent)' }}
+                >
                   <div className="text-center">
                     <div className="text-4xl mb-3 animate-spin inline-block">⟳</div>
-                    <p className="text-[15px] font-medium text-indigo-600">解析中，請稍候...</p>
+                    <p className="text-[15px] font-medium" style={{ color: 'var(--al-accent)' }}>解析中，請稍候...</p>
                   </div>
                 </div>
               )}
 
               {/* 錯誤訊息 */}
               {error && (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 px-5 py-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[14px] shadow-lg">
+                <div
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 px-5 py-3 rounded-xl text-[14px] shadow-lg"
+                  style={{
+                    background: 'var(--al-surface-raised)',
+                    border: '1px solid var(--al-danger)',
+                    color: 'var(--al-danger)',
+                  }}
+                >
                   ⚠️ {error}
                 </div>
               )}
